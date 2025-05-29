@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Names Horizontal List</title>
+  <link rel="stylesheet" href="https://use.typekit.net/rdn8fde.css" />
+
+  <style>
+    body {
+      font-family: "proxima-nova", sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #101010;
+      color: #fff;
+      text-align: center;
+    }
+
+  #word-cloud {
+    max-width: 100%;
+    margin: 0 auto;
+    font-size: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    color: #fff;
+    gap: 5px;
+  }
+
+  .word {
+    white-space: nowrap;
+  }
+
+  .separator {
+    user-select: none;
+    color: #888;
+    margin: 0 5px;
+  }
+</style>
+
+<div id="word-cloud"></div>
+
+<script>
+  function formatName(name) {
+    return name
+      .toLowerCase()
+      .split(' ')
+      .map((word, i, arr) => {
+        if (word.length === 1 && i > 0 && i < arr.length - 1) {
+          return word.toUpperCase() + '.';
+        }
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      })
+      .join(' ');
+  }
+
+ fetch('data/names.json')
+  .then(response => response.json())
+  .then(data => {
+    const names = data.map(entry => entry["Full Name"]);
+    const formattedNames = names.map(formatName);
+
+    const container = document.getElementById('word-cloud');
+    container.innerHTML = '';
+
+    formattedNames.forEach((name, i) => {
+      const span = document.createElement('span');
+      span.className = 'word';
+      span.textContent = name;
+      container.appendChild(span);
+
+      if (i < formattedNames.length - 1) {
+        const sep = document.createElement('span');
+        sep.className = 'separator';
+        sep.textContent = '•';
+        container.appendChild(sep);
+      }
+    });
+
+    // Randomly color some names purple
+    const words = container.querySelectorAll('.word');
+    words.forEach(word => {
+      if (Math.random() < 0.3) {  // 30% chance
+        word.style.color = "#8A53DB";
+      }
+    });
+
+    // ... widow fix code from before
+  });
+</script>
