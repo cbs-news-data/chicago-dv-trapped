@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Scroll-driven Word Cloud</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'proxima-nova', sans-serif;
+    }
+    .container {
+      position: relative;
+      overflow-x: hidden;
+    }
+    .step {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+      padding: 0 1rem;
+    }
+    #word-cloud {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 100vw;
+      z-index: 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      font-size: 16px;
+      background-color: black;
+      color: white;
+      line-height: 1.6;
+      pointer-events: none;
+    }
+    .word {
+      white-space: nowrap;
+      transition: color 0.5s;
+      margin: 0 5px;
+      user-select: none;
+    }
+    .separator {
+      user-select: none;
+      margin: 0 5px;
+      color: white;
+    }
+    .scroll-textbox {
+      background-color: white;
+      color: black;
+      padding: 2rem;
+      border-radius: 12px;
+      max-width: 800px;
+      margin: auto;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      z-index: 2;
+    }
+    .step[data-step="1"] .scroll-textbox {
+      background-color: black;
+      color: white;
+      border: 1px solid #8A53DB;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="word-cloud">Loading names...</div>
+
+  <div class="container">
+    <article>
+
+      <div class="step" data-step="0">
+        <div class="scroll-textbox">
+          <h2>These are the names of those involved</h2>
+          <p>This text scrolls over the word cloud. All names are shown in white to start.</p>
+        </div>
+      </div>
+
+      <div class="step" data-step="1">
+        <div class="scroll-textbox">
+          <h2>Domestic involvement highlighted</h2>
+          <p>Now we highlight domestic participants in purple.</p>
+        </div>
+      </div>
+
+    </article>
+  </div>
+
+  <script src="https://unpkg.com/scrollama"></script>
+  <script>
+    // Format names: capitalize each part, uppercase initials for middle initials
+    function formatName(name) {
+      return name
+        .toLowerCase()
+        .split(' ')
+        .map((word, i, arr) => {
+          if (word.length === 1 && i > 0 && i < arr.length - 1) {
+            return word.toUpperCase() + '.';
+          }
+          return word
+            .split('-')
+            .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+            .join('-');
+        })
+        .join(' ');
+    }
+
+    // Shuffle array in place
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    let allWords = [];
+
+    // Load data & build word cloud
+    fetch('data/names.json')
+      .then(response => response.json())
+      .then(data => {
+        shuffleArray(data);
+        const container = document.getElementById('word-cloud');
+        container.innerHTML = '';
+
+        data.forEach((entry, i) => {
+          const name = formatName(entry["Full Name"]);
+          const domestic = entry["domestic"];
+          const span = document.createElement('span');
+          span.className = 'word';
+          span.textContent = name;
+          span.setAttribute('domestic', domestic);
+          span.style.color = 'white';
+          container.appendChild(span);
+          allWords.push(span);
+
+          if (i < data.length - 1) {
+            const sep = document.createElement('span');
+            sep.className = 'separator';
+            sep.textContent = '•';
+            container.appendChild(sep);
+          }
+        });
+
+        initScroll();
+      })
+      .catch(() => {
+        document.getElementById('word-cloud').textContent = 'Failed to load names.';
+      });
+
+    // Update colors depending on scroll step
+    function updateWordColors(step) {
+      allWords.forEach(word => {
+        const isDomestic = word.getAttribute('domestic') === "TRUE";
+        if (step === 0) {
+          word.style.color = 'white';
+        } else if (step === 1) {
+          word.style.color = isDomestic ? '#8A53DB' : '#323232';
+        }
+      });
+    }
+
+    // Setup scrollama and handlers
+    function initScroll() {
+      const scroller = scrollama();
+      scroller.setup({
+        step: '.step',
+        offset: 0.5,
+        debug: false,
+      })
+      .onStepEnter(response => {
+        const step = parseInt(response.element.getAttribute('data-step'));
+        updateWordColors(step);
+      });
+
+      window.addEventListener('resize', scroller.resize);
+    }
+  </script>
+
+</body>
+</html>

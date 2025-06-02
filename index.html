@@ -1,45 +1,115 @@
-<!DOCTYPE html>
-<html lang="en">
+<style>
 
-<head>
-  <meta charset="UTF-8" />
-  <title>Names Horizontal List</title>
-  <link rel="stylesheet" href="https://use.typekit.net/rdn8fde.css" />
+        body {
+        margin: 0px;
+      }
 
-  <style>
-    body {
-      font-family: "proxima-nova", sans-serif;
-      margin: 0;
-      padding: 20px;
-      background-color: #101010;
-      color: #fff;
-      text-align: center;
+      #component-9ec5aca8-485f-4a44-bd56-ae9cae0b3009 {padding: 0;}    
+
+      #component-9ec5aca8-485f-4a44-bd56-ae9cae0b3009 .component__item-wrapper {max-width: 100%;}
+        
+      #scrolly {
+        position: relative;
+        /* border: 2px solid pink; */
+      }
+
+      article {
+        position: relative;
+        padding: 0;
+        width: 100%;
+        margin: 0 auto;
+      }
+
+    .container {
+      position: relative;
+      overflow-x: hidden;
     }
 
-  #word-cloud {
-    max-width: 100%;
-    margin: 0 auto;
-    font-size: 20px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    color: #fff;
-    gap: 5px;
-  }
+    .step {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+    }
 
-  .word {
-    white-space: nowrap;
-  }
+    #word-cloud {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 100vw;
+      z-index: 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      font-size: 16px;
+      font-family: 'proxima-nova', sans-serif;
+      background-color: black;
+      color: white;
+      line-height: 1.6;
+      pointer-events: none;
+    }
 
-  .separator {
-    user-select: none;
-    color: #888;
-    margin: 0 5px;
-  }
-</style>
+    .word {
+      white-space: nowrap;
+      transition: color 0.5s;
+    }
 
-<div id="word-cloud"></div>
+    .separator {
+      user-select: none;
+      margin: 0 5px;
+      color: white;
+    }
 
+    .scroll-textbox {
+      background-color: white;
+      color: black;
+      padding: 2rem;
+      border-radius: 12px;
+      max-width: 800px;
+      margin: auto;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      z-index: 2;
+    }
+
+    /* Optional: styling for Step 1 */
+    .step[data-step="1"] .scroll-textbox {
+      background-color: black;
+      color: white;
+      border: 1px solid #8A53DB;
+    }
+  </style>
+
+  <div id="word-cloud"></div>
+
+  <div class="container">
+    <article>
+
+      <!-- Step 0 -->
+      <div class="step" data-step="0">
+        <div class="scroll-textbox">
+          <h2>These are the names of those involved</h2>
+          <p>This text scrolls over the word cloud. All names are shown in white to start.</p>
+        </div>
+      </div>
+
+      <!-- Step 1 -->
+      <div class="step" data-step="1">
+        <div class="scroll-textbox">
+          <h2>Domestic involvement highlighted</h2>
+          <p>Now we highlight domestic participants in purple.</p>
+        </div>
+      </div>
+
+    </article>
+  </div>
+
+<script src="https://unpkg.com/scrollama"></script>
 <script>
   function formatName(name) {
     return name
@@ -49,42 +119,77 @@
         if (word.length === 1 && i > 0 && i < arr.length - 1) {
           return word.toUpperCase() + '.';
         }
-        return word.charAt(0).toUpperCase() + word.slice(1);
+        return word
+          .split('-')
+          .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+          .join('-');
       })
       .join(' ');
   }
 
- fetch('data/names.json')
-  .then(response => response.json())
-  .then(data => {
-    const names = data.map(entry => entry["Full Name"]);
-    const formattedNames = names.map(formatName);
+  function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+  }
 
-    const container = document.getElementById('word-cloud');
-    container.innerHTML = '';
+  let allWords = [];
 
-    formattedNames.forEach((name, i) => {
-      const span = document.createElement('span');
-      span.className = 'word';
-      span.textContent = name;
-      container.appendChild(span);
+  fetch('data/names.json')
+    .then(response => response.json())
+    .then(data => {
+      shuffleArray(data);
+      const container = document.getElementById('word-cloud');
+      container.innerHTML = '';
 
-      if (i < formattedNames.length - 1) {
-        const sep = document.createElement('span');
-        sep.className = 'separator';
-        sep.textContent = '•';
-        container.appendChild(sep);
-      }
+      data.forEach((entry, i) => {
+        const name = formatName(entry["Full Name"]);
+        const domestic = entry["domestic"];
+        const span = document.createElement('span');
+        span.className = 'word';
+        span.textContent = name;
+        span.setAttribute('domestic', domestic);
+        span.style.color = 'white';
+        span.style.whiteSpace = 'nowrap';
+
+        container.appendChild(span);
+        allWords.push(span);
+
+        if (i < data.length - 1) {
+          const sep = document.createElement('span');
+          sep.className = 'separator';
+          sep.textContent = '•';
+          container.appendChild(sep);
+        }
+      });
+
+      initScroll();
     });
 
-    // Randomly color some names purple
-    const words = container.querySelectorAll('.word');
-    words.forEach(word => {
-      if (Math.random() < 0.3) {  // 30% chance
-        word.style.color = "#8A53DB";
+  function updateWordColors(step) {
+    allWords.forEach(word => {
+      const isDomestic = word.getAttribute('domestic') === "TRUE";
+      if (step === 0) {
+        word.style.color = 'white';
+      } else if (step === 1) {
+        word.style.color = isDomestic ? '#8A53DB' : '#323232';
       }
     });
+  }
 
-    // ... widow fix code from before
-  });
+  function initScroll() {
+    const scroller = scrollama();
+
+    scroller
+      .setup({
+        step: '.step',
+        offset: 0.5,
+        debug: false
+      })
+      .onStepEnter(response => {
+        const step = parseInt(response.element.getAttribute('data-step'));
+        updateWordColors(step);
+      });
+  }
 </script>
