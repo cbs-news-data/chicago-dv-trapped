@@ -1,37 +1,92 @@
-<style>
+<!DOCTYPE html>
+<html lang="en">
 
-        body {
-        margin: 0px;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Scrollytelling with Word Cloud and Datawrapper</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Proxima Nova', sans-serif;
+    }
 
-      #component-9ec5aca8-485f-4a44-bd56-ae9cae0b3009 {padding: 0;}    
+    #component-1efe3849-7359-4b2e-922d-6ad45b511e99 {
+      padding: 0;
+    }
 
-      #component-9ec5aca8-485f-4a44-bd56-ae9cae0b3009 .component__item-wrapper {max-width: 100%;}
-        
-      #scrolly {
-        position: relative;
-        /* border: 2px solid pink; */
-      }
+    #component-1efe3849-7359-4b2e-922d-6ad45b511e99 .component__item-wrapper {
+      max-width: 100%;
+    }
 
-      article {
-        position: relative;
-        padding: 0;
-        width: 100%;
-        margin: 0 auto;
-      }
-
-    .container {
+    #scrolly {
       position: relative;
-      overflow-x: hidden;
+    }
+
+    article {
+      position: relative;
+      padding: 0;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .sticky-thing {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      z-index: 1;
+      display: flex;
+      align-items: flex-end;
+      justify-content: bottom;
     }
 
     .step {
+      width: 100%;
+      height: 100vh;
+    }
+
+    .scroll-textbox {
+      background-color: white;
+      max-width: 550px;
+      padding: 1rem;
+      margin: auto;
       position: relative;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1;
+      top: 80%;
+      color: #101010;
+      border-radius: 3px;
+      border: 1px solid black;
+      text-align: center;
+      font-size: 21px;
+      z-index: 2;
+    }
+
+    .scrolly-photo-box {
+      width: 100%;
+      height: calc(100vh - 64px);
+      position: relative;
+    }
+
+    .scrolly-photo {
+      height: 100%;
+      width: 100%;
+      opacity: 0;
+      position: absolute;
+      background-color: #101010;
+    }
+
+    .scrolly-photo-01 {
+      opacity: 1;
+    }
+
+    
+
+    .inner-scrolly-video video,
+    .inner-scrolly-photo video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     #word-cloud {
@@ -39,157 +94,199 @@
       top: 0;
       left: 0;
       height: 100vh;
-      width: 100vw;
+      /* width: 100%; */
       z-index: 0;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      align-items: center;
+      align-content: center;
       padding: 2rem;
       font-size: 16px;
-      font-family: 'proxima-nova', sans-serif;
-      background-color: black;
+      background-color: #101010;
       color: white;
-      line-height: 1.6;
+      line-height: 1.3;
       pointer-events: none;
+      overflow-y: auto;
+      /* In case very small screens have overflow */
+      text-align: center;
     }
 
     .word {
       white-space: nowrap;
       transition: color 0.5s;
+      margin: 0 0.3rem;
+      user-select: none;
     }
 
     .separator {
       user-select: none;
-      margin: 0 5px;
+      margin: 0 0.3rem;
       color: white;
     }
 
-    .scroll-textbox {
-      background-color: white;
+    .scroll-text {
       color: black;
-      padding: 2rem;
-      border-radius: 12px;
-      max-width: 800px;
-      margin: auto;
-      text-align: center;
-      box-shadow: 0 0 20px rgba(0,0,0,0.2);
-      z-index: 2;
     }
 
-    /* Optional: styling for Step 1 */
-    .step[data-step="1"] .scroll-textbox {
-      background-color: black;
-      color: white;
-      border: 1px solid #8A53DB;
+    @media (max-width: 600px) {
+      .scroll-textbox {
+        top: 65%;
+        font-size: 10px;
+      }
+
+      #word-cloud {
+        padding: 1rem;
+        font-size: 16px;
+      }
     }
   </style>
+</head>
 
-  <div id="word-cloud"></div>
+<body>
+  <main><div id="word-cloud" style="display:none;">Loading names...</div>
 
-  <div class="container">
-    <article>
+    <section id="scrolly">
+      <div class="sticky-thing">
 
-      <!-- Step 0 -->
-      <div class="step" data-step="0">
-        <div class="scroll-textbox">
-          <h2>These are the names of those involved</h2>
-          <p>This text scrolls over the word cloud. All names are shown in white to start.</p>
-        </div>
+</div>
+
+<script type="text/javascript">
+!function() {
+  var d = document, s = d.createElement('script');
+  s.src = 'https://datawrapper.dwcdn.net/ii1WI.js';
+  s.async = true;
+  s.onload = () => console.log('Datawrapper script loaded');
+  d.head.appendChild(s);
+}();
+</script>
       </div>
 
-      <!-- Step 1 -->
-      <div class="step" data-step="1">
-        <div class="scroll-textbox">
-          <h2>Domestic involvement highlighted</h2>
-          <p>Now we highlight domestic participants in purple.</p>
+      <article>
+        <div class="step" data-step="0" data-background="scrolly-photo-01">
+          <div class="scroll-textbox">
+            <div class="scroll-text">Since 2020, nearly 450 women were murdered in Chicago.</div>
+          </div>
         </div>
-      </div>
 
-    </article>
-  </div>
+        <div class="step" data-step="1" data-background="scrolly-photo-02">
+          <div class="scroll-textbox">
+            <div class="scroll-text">One in 4 women, 120 in total, lost their lives in a domestic violence incident.
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
 
-<script src="https://unpkg.com/scrollama"></script>
-<script>
-  function formatName(name) {
-    return name
-      .toLowerCase()
-      .split(' ')
-      .map((word, i, arr) => {
-        if (word.length === 1 && i > 0 && i < arr.length - 1) {
-          return word.toUpperCase() + '.';
-        }
-        return word
-          .split('-')
-          .map(part => part.charAt(0).toUpperCase() + part.slice(1))
-          .join('-');
-      })
-      .join(' ');
-  }
-
-  function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
+  <script src="https://unpkg.com/scrollama"></script>
+  <script>
+    function formatName(name) {
+      return name
+        .toLowerCase()
+        .split(' ')
+        .map((word, i, arr) => {
+          if (word.length === 1 && i > 0 && i < arr.length - 1) {
+            return word.toUpperCase() + '.';
+          }
+          return word
+            .split('-')
+            .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+            .join('-');
+        })
+        .join(' ');
     }
-  }
 
-  let allWords = [];
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
 
-  fetch('data/names.json')
-    .then(response => response.json())
-    .then(data => {
-      shuffleArray(data);
-      const container = document.getElementById('word-cloud');
-      container.innerHTML = '';
+    let allWords = [];
 
-      data.forEach((entry, i) => {
-        const name = formatName(entry["Full Name"]);
-        const domestic = entry["domestic"];
-        const span = document.createElement('span');
-        span.className = 'word';
-        span.textContent = name;
-        span.setAttribute('domestic', domestic);
-        span.style.color = 'white';
-        span.style.whiteSpace = 'nowrap';
+    fetch('https://cbs-news-data.github.io/chicago-dv-trapped/data/names.json')
+      .then(response => response.json())
+      .then(data => {
+        shuffleArray(data);
+        const container = document.getElementById('word-cloud');
+        container.innerHTML = '';
 
-        container.appendChild(span);
-        allWords.push(span);
+        data.forEach((entry, i) => {
+          const name = formatName(entry["Full Name"]);
+          const domestic = entry["domestic"];
+          const span = document.createElement('span');
+          span.className = 'word';
+          span.textContent = name;
+          span.setAttribute('domestic', domestic);
+          span.style.color = 'white';
+          container.appendChild(span);
+          allWords.push(span);
 
-        if (i < data.length - 1) {
-          const sep = document.createElement('span');
-          sep.className = 'separator';
-          sep.textContent = '•';
-          container.appendChild(sep);
-        }
+          if (i < data.length - 1) {
+            const sep = document.createElement('span');
+            sep.className = 'separator';
+            sep.textContent = '\u2022';
+            container.appendChild(sep);
+          }
+        });
+
+        initScroll();
+      })
+      .catch(() => {
+        document.getElementById('word-cloud').textContent = 'Failed to load names.';
       });
 
-      initScroll();
-    });
+function updateWordColors(step) {
+  const wordCloud = document.getElementById('word-cloud');
+  const datawrapperChart = document.getElementById('datawrapper-chart');
 
-  function updateWordColors(step) {
+  if (step === 2) {
+    wordCloud.style.display = 'none';
+    if (datawrapperChart) datawrapperChart.style.display = 'block';
+  } else {
+    wordCloud.style.display = 'flex';
+    if (datawrapperChart) datawrapperChart.style.display = 'none';
+
     allWords.forEach(word => {
       const isDomestic = word.getAttribute('domestic') === "TRUE";
-      if (step === 0) {
-        word.style.color = 'white';
-      } else if (step === 1) {
-        word.style.color = isDomestic ? '#8A53DB' : '#323232';
+
+      // Default color
+      let color = 'white';
+
+      if (step === 1) {
+        color = isDomestic ? '#8A53DB' : '#323232';
+      }
+
+      word.style.color = color;
+
+      const next = word.nextElementSibling;
+      if (next && next.classList.contains('separator')) {
+        next.style.color = step === 1 && isDomestic ? '#8A53DB' : (step === 1 ? '#323232' : 'white');
       }
     });
   }
+}
 
-  function initScroll() {
-    const scroller = scrollama();
+    function initScroll() {
+      const scroller = scrollama();
+      scroller
+        .setup({
+          step: '.step',
+          offset: 0.5,
+          debug: false,
+        })
+        .onStepEnter(response => {
+          const step = parseInt(response.element.getAttribute('data-step'));
+          console.log('Current step:', step);
+          updateWordColors(step);
+        });
 
-    scroller
-      .setup({
-        step: '.step',
-        offset: 0.5,
-        debug: false
-      })
-      .onStepEnter(response => {
-        const step = parseInt(response.element.getAttribute('data-step'));
-        updateWordColors(step);
-      });
-  }
-</script>
+      window.addEventListener('resize', scroller.resize);
+    }
+  </script>
+
+  
+</body>
+
+</html>
